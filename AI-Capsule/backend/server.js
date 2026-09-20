@@ -30,7 +30,19 @@ app.get('/login', passport.authenticate('github', { session: false }));
 
 // OAuth callback — issue our own JWT after GitHub confirms identity
 app.get('/auth/github/callback',
-  passport.authenticate('github', { session: false, failureRedirect: '/' }),
+  (req, res, next) => {
+    passport.authenticate('github', { session: false }, (err, user) => {
+      if (err) {
+        console.error('OAuth callback error:', err.message);
+        return res.redirect('/login?error=oauth_failed');
+      }
+      if (!user) {
+        return res.redirect('/login?error=oauth_failed');
+      }
+      req.user = user;
+      next();
+    })(req, res, next);
+  },
   (req, res) => {
     const token = jwt.sign(
       { id: req.user.id, username: req.user.username },
@@ -45,7 +57,7 @@ app.get('/auth/github/callback',
       maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
-    res.redirect(process.env.NODE_ENV === 'production' ? '/dashboard' : 'http://localhost:5173/dashboard');
+    res.redirect(process.env.NODE_ENV === 'production' ? '/dashboard' : 'http://localhost:5000/auth/github/callback');
   }
 );
 
