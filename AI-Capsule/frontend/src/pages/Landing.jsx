@@ -13,15 +13,18 @@ function Landing() {
   }, []);
 
   return (
-    <div style={{ maxWidth: 600, margin: '80px auto', textAlign: 'center', fontFamily: 'sans-serif' }}>
+    <div className="landing">
       <h1>AI Capsule</h1>
       <p>Save, review and improve your AI prompts in one private, secure place.</p>
-      <p>Backend status: <strong>{health}</strong></p>
-      <a href={`${API_BASE}/login`}>
-        <button style={{ padding: '10px 20px', fontSize: 16, cursor: 'pointer' }}>
-          Log in with GitHub
-        </button>
-      </a>
+      <div className="status-badge">
+        <span className="status-dot"></span>
+        Backend status: {health}
+      </div>
+      <div>
+        <a href={`${API_BASE}/login`}>
+          <button className="btn-primary">Log in with GitHub</button>
+        </a>
+      </div>
     </div>
   );
 }

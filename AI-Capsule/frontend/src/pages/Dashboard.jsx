@@ -75,6 +75,7 @@ function Dashboard() {
       notes: capsule.notes || ''
     });
     setEditingId(capsule.id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   async function handleDelete(id) {
@@ -83,14 +84,14 @@ function Dashboard() {
     loadCapsules();
   }
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p className="loading-text">Loading...</p>;
 
   return (
-    <div style={{ maxWidth: 700, margin: '40px auto', fontFamily: 'sans-serif' }}>
+    <div className="dashboard">
       <h1>Dashboard</h1>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {error && <div className="error-banner">{error}</div>}
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 30 }}>
+      <form onSubmit={handleSubmit} className="capsule-form">
         <input name="project_name" placeholder="Project name" value={form.project_name} onChange={handleChange} required />
         <input name="prompt_title" placeholder="Prompt title" value={form.prompt_title} onChange={handleChange} required />
         <input name="prompt_version" placeholder="Version (v1, v2...)" value={form.prompt_version} onChange={handleChange} />
@@ -98,26 +99,33 @@ function Dashboard() {
         <textarea name="response_summary" placeholder="Response summary" value={form.response_summary} onChange={handleChange} />
         <input name="category" placeholder="Category" value={form.category} onChange={handleChange} />
         <input name="usefulness" placeholder="Usefulness" value={form.usefulness} onChange={handleChange} />
-        <label><input type="checkbox" name="reviewed" checked={form.reviewed} onChange={handleChange} /> Reviewed</label>
-        <label><input type="checkbox" name="improved" checked={form.improved} onChange={handleChange} /> Improved</label>
+        <label className="checkbox-row"><input type="checkbox" name="reviewed" checked={form.reviewed} onChange={handleChange} /> Reviewed</label>
+        <label className="checkbox-row"><input type="checkbox" name="improved" checked={form.improved} onChange={handleChange} /> Improved</label>
         <input name="screenshot_url" placeholder="Screenshot URL" value={form.screenshot_url} onChange={handleChange} />
         <textarea name="notes" placeholder="Notes" value={form.notes} onChange={handleChange} />
-        <button type="submit">{editingId ? 'Update capsule' : 'Add capsule'}</button>
-        {editingId && (
-          <button type="button" onClick={() => { setForm(emptyForm); setEditingId(null); }}>
-            Cancel edit
-          </button>
-        )}
+        <div className="form-actions">
+          <button type="submit" className="btn-submit">{editingId ? 'Update capsule' : 'Add capsule'}</button>
+          {editingId && (
+            <button type="button" className="btn-cancel" onClick={() => { setForm(emptyForm); setEditingId(null); }}>
+              Cancel
+            </button>
+          )}
+        </div>
       </form>
 
-      {capsules.length === 0 && <p>No capsules yet.</p>}
+      {capsules.length === 0 && <p className="empty-state">No capsules yet.</p>}
 
       {capsules.map(c => (
-        <div key={c.id} style={{ border: '1px solid #ccc', padding: 12, marginBottom: 10, borderRadius: 6 }}>
-          <strong>{c.prompt_title}</strong> ({c.project_name}, {c.prompt_version})
+        <div key={c.id} className="capsule-card">
+          <div className="capsule-card-header">
+            <strong>{c.prompt_title}</strong>
+            <span className="capsule-meta">{c.project_name} · {c.prompt_version || 'no version'}</span>
+          </div>
           <p>{c.prompt_text}</p>
-          <button onClick={() => startEdit(c)}>Edit</button>
-          <button onClick={() => handleDelete(c.id)}>Delete</button>
+          <div className="capsule-card-actions">
+            <button className="btn-edit" onClick={() => startEdit(c)}>Edit</button>
+            <button className="btn-delete" onClick={() => handleDelete(c.id)}>Delete</button>
+          </div>
         </div>
       ))}
     </div>
